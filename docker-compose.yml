@@ -1,0 +1,26 @@
+app:
+  build: ./app
+#  volumes:
+#    - /usr/src/app/
+#  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
+  links:
+    - db
+  expose:
+    - "8000"
+
+web:
+  build: ./web
+  volumes_from:
+    - app
+  volumes:
+    - /www/static
+  links:
+    - app
+  ports:
+    - "80"
+
+db:
+  restart: always
+  build: ./db
+  ports:
+    - "5432" 
