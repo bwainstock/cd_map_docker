@@ -1,2 +1,2 @@
 FROM python:onbuild
-CMD ["/usr/local/bin/gunicorn", "-w", "2", "-b", ":8000", "app:app"]
+CMD ["/usr/local/bin/gunicorn", "-c", "gunicorn.conf", "-w", "2", "-b", ":8000", "app:app"]

@@ -7,7 +7,7 @@ docker run -it -p hostport:5432 cdmapdocker_db
 
 ## app
 
-TODO
+docker-compose build app
 
 ## web
 

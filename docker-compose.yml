@@ -4,9 +4,10 @@ app:
 #    - /usr/src/app/
 #  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
   links:
-    - db
-  expose:
-    - "8000"
+    - db:postgres
+  env_file: ./app/.env
+  ports:
+    - "8000:8000"
 
 web:
   build: ./web
@@ -17,10 +18,10 @@ web:
   links:
     - app
   ports:
-    - "80"
+    - "80:80"
 
 db:
   restart: always
   build: ./db
   ports:
-    - "5432" 
+    - "5432:5432" 
