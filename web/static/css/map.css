@@ -1,0 +1,26 @@
+.container {
+    height: 100vh;
+    width: 100vw;
+}
+#map {height: 100%; width: 100%;}
+.candidate {
+    padding: 10px 20px;
+}
+.candidate + .candidate {
+    border-top: thin black;
+    border-top-style: solid;
+}
+#infoName {
+    width: 100%;
+    text-align: center;
+}
+
+#overlay {
+    position:absolute;
+    right: 2vw;
+    top: 10vh;
+    background-image: url('../img/transparent.png');
+    width:300px;
+    height:80vh;
+    z-index: 100;
+}

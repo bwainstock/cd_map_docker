@@ -5,6 +5,7 @@ app:
 #  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
   links:
     - db:postgres
+    - redis:redis
   env_file: ./app/.env
   ports:
     - "8000:8000"
@@ -16,7 +17,8 @@ web:
   volumes:
     - /www/static
   links:
-    - app
+    - app:app
+  restart: always
   ports:
     - "80:80"
 
@@ -25,3 +27,8 @@ db:
   build: ./db
   ports:
     - "5432:5432" 
+
+redis:
+  image: redis
+  ports:
+    - "6379:6379"

@@ -12,3 +12,7 @@ class BaseConfig(object):
     SQLALCHEMY_DATABASE_URI = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(
         DB_USER, DB_PASS, DB_SERVICE, DB_PORT, DB_NAME
     )
+    CACHE_TYPE = os.environ['CACHE_TYPE']
+    CACHE_KEY_PREFIX = os.environ['CACHE_KEY_PREFIX']
+    CACHE_REDIS_URL = os.environ['CACHE_REDIS_URL']
+    

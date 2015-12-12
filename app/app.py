@@ -2,6 +2,7 @@ from geojson import Feature, FeatureCollection
 from geomet import wkt
 import json
 import requests
+import time
 
 from geoalchemy2 import Geometry
 from sqlalchemy import func
@@ -10,12 +11,21 @@ from flask import Flask
 from flask import request
 from flask.ext.cors import CORS
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.cache import Cache
 
 from config import BaseConfig
 
 
 app = Flask(__name__)
 app.config.from_object(BaseConfig)
+#cache = Cache(app, config={
+#    'CACHE_TYPE': 'redis',
+#    'CACHE_KEY_PREFIX': 'fcache',
+#    'CACHE_REDIS_HOST': 'redis',
+#    'CACHE_REDIS_PORT': '6379',
+#    'CACHE_REDIS_URL': 'redis://redis:6379'
+#    })
+app.cache = Cache(app)
 db = SQLAlchemy(app)
 CORS(app)
 
@@ -39,6 +49,12 @@ class District(db.Model):
     def __repr__(self):
         return self.namelsad
 
+
+def make_cache_key(*args, **kwargs):
+    #path = request.path
+    #args = str(hash(frozenset(request.args.items())))
+    #return (path + args).encode('utf-8')
+    return str(request.url)
 
 def get_simplify_factor(zoom):
     zoom = int(zoom)
@@ -135,8 +151,8 @@ def get_districts(simplify):
                                              func.ST_AsText(func.ST_Simplify(District.geom, simplify)))
     return districts
 
-
 @app.route('/api/', methods=['GET'])
+@app.cache.cached(timeout=50, key_prefix=make_cache_key)
 def district_geometry():
     simplify = get_simplify_factor(request.args.get('zoom'))
     districts = get_districts(simplify).all()
@@ -145,6 +161,7 @@ def district_geometry():
 
 
 @app.route('/api/district/', methods=['GET'])
+@app.cache.cached(timeout=50, key_prefix=make_cache_key)
 def get_opensecrets():
     idcode = request.args.get('idcode')
     url = 'http://www.opensecrets.org/api/'
@@ -157,6 +174,7 @@ def get_opensecrets():
 
 
 @app.route('/api/bbox/', methods=['GET'])
+@app.cache.cached(timeout=50, key_prefix=make_cache_key)
 def cdistrict_bbox():
     bbox = request.args.get('bbox')
     zoom = request.args.get('zoom')
@@ -175,6 +193,11 @@ def cdistrict_bbox():
                             bounded_districts])
     return json.dumps(fc)
 
+
+@app.route("/api/butt/")
+@app.cache.cached(timeout=300)  # cache this view for 5 minutes
+def cached_view():
+    return time.ctime()
 
 if __name__ == '__main__':
     app.run()
